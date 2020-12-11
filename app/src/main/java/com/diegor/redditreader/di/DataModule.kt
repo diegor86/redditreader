@@ -9,7 +9,7 @@ import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityRetainedComponent
+import dagger.hilt.android.components.ApplicationComponent
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -18,7 +18,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 @Module
-@InstallIn(ActivityRetainedComponent::class)
+@InstallIn(ApplicationComponent::class)
 object DataModule {
 
     @Provides
@@ -35,7 +35,7 @@ object DataModule {
 
             // TODO: Hardcoded ATM
             requestBuilder.addHeader("User-Agent", "redditReader by r/Geredis")
-            requestBuilder.addHeader("Authorization", "bearer -16xa6X2c5vnQv6b4EF9rIp6PczqmTw")
+            requestBuilder.addHeader("Authorization", "bearer -JkgrJeNqjYjpoo_nkUK2XNg7FMqvAQ")
 
             chain.proceed(requestBuilder.build())
         }

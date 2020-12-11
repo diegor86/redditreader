@@ -17,7 +17,7 @@ class RedditRepository @Inject constructor(private val service: RedditService
         val response = service.getTopEntries()
 
         if (response.isSuccessful) {
-            emit(Result.Success(response.body()!!.data.children))
+            emit(Result.Success(response.body()!!.data.children.map { it.entry }))
         } else {
             response.errorBody()?.let {
                 emit(Result.Error(Exception(parseErrors(it))))

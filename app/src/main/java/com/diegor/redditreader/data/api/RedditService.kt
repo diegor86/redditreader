@@ -6,7 +6,7 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface RedditService {
-    @GET("/r/all/top")
+    @GET("top")
     suspend fun getTopEntries(@Query("limit") limit: Int = 25,
                               @Query("show") show: String = "all"
     ): Response<Page>
