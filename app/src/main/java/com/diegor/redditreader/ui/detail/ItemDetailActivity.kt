@@ -1,4 +1,4 @@
-package com.diegor.redditreader
+package com.diegor.redditreader.ui.detail
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,6 +6,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
+import com.diegor.redditreader.R
+import com.diegor.redditreader.ui.list.ItemListActivity
 
 /**
  * An activity representing a single Item detail screen. This
@@ -40,9 +42,11 @@ class ItemDetailActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
-            val fragment = ItemDetailFragment().apply {
+            val fragment = ItemDetailFragment()
+                .apply {
                 arguments = Bundle().apply {
-                    putString(ItemDetailFragment.ARG_ITEM_ID,
+                    putString(
+                        ItemDetailFragment.ARG_ITEM_ID,
                             intent.getStringExtra(ItemDetailFragment.ARG_ITEM_ID))
                 }
             }
