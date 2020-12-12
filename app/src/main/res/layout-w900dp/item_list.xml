@@ -13,16 +13,21 @@
     <!--
     This layout is a two-pane layout for the Items master/detail flow.
     -->
-
-    <androidx.recyclerview.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/item_list"
-        android:name="com.diegor.redditreader.ItemListFragment"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh"
         android:layout_width="@dimen/item_width"
-        android:layout_height="match_parent"
-        app:layoutManager="LinearLayoutManager"
-        tools:context="com.diegor.redditreader.ui.list.ItemListActivity"
-        tools:listitem="@layout/item_list_content" />
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/item_list"
+            android:name="com.diegor.redditreader.ItemListFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layoutManager="LinearLayoutManager"
+            tools:context="com.diegor.redditreader.ui.list.ItemListActivity"
+            tools:listitem="@layout/item_list_content" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <FrameLayout
         android:id="@+id/item_detail_container"

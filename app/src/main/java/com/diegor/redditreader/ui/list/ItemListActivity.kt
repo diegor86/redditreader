@@ -10,10 +10,14 @@ import com.google.android.material.snackbar.Snackbar
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.diegor.redditreader.ui.detail.ItemDetailActivity
 import com.diegor.redditreader.R
 import com.diegor.redditreader.data.entities.Entry
+import com.diegor.redditreader.ui.util.InfiniteScrollListener
 import com.diegor.redditreader.ui.util.MarginDecorator
+import com.diegor.redditreader.ui.util.ScrollListener
 
 import com.diegor.redditreader.util.result.EventObserver
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,7 +31,7 @@ import dagger.hilt.android.AndroidEntryPoint
  * item details side-by-side using two vertical panes.
  */
 @AndroidEntryPoint
-class ItemListActivity : AppCompatActivity() {
+class ItemListActivity : AppCompatActivity(), InfiniteScrollListener {
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -36,6 +40,7 @@ class ItemListActivity : AppCompatActivity() {
     private var twoPane: Boolean = false
 
     private lateinit var adapter: EntryRecyclerViewAdapter
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     private val viewModel by viewModels<EntryListViewModel>()
 
@@ -43,6 +48,12 @@ class ItemListActivity : AppCompatActivity() {
         val movies = it ?: return@Observer
 
         adapter.submitList(movies)
+    }
+
+    private val loadingObserver = Observer<Boolean> {
+        val loading = it ?: return@Observer
+
+        swipeRefreshLayout.isRefreshing = loading
     }
 
     private val errorObserver = EventObserver<String> { error ->
@@ -72,7 +83,13 @@ class ItemListActivity : AppCompatActivity() {
 
         setupRecyclerView(findViewById(R.id.item_list))
 
+        swipeRefreshLayout = findViewById(R.id.swipe_refresh)
+        swipeRefreshLayout.setOnRefreshListener {
+            viewModel.onRefreshTop()
+        }
+
         viewModel.entryList.observe(this, entriesObserver)
+        viewModel.loading.observe(this, loadingObserver)
         viewModel.errors.observe(this, errorObserver)
 
         viewModel.authenticateAndGetEntries()
@@ -80,6 +97,7 @@ class ItemListActivity : AppCompatActivity() {
 
     private fun setupRecyclerView(recyclerView: RecyclerView) {
         recyclerView.addItemDecoration(MarginDecorator(this, R.dimen.recycler_item_margin))
+        recyclerView.addOnScrollListener(ScrollListener(this, recyclerView.layoutManager as LinearLayoutManager))
         adapter = EntryRecyclerViewAdapter(
             this,
             twoPane
@@ -88,4 +106,7 @@ class ItemListActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
     }
 
+    override fun onReachedBottom() {
+        viewModel.onBottomReached()
+    }
 }

@@ -10,8 +10,8 @@ class GetTopEntriesUseCase @Inject constructor(
     private val repository: RedditRepository
 ) {
 
-    suspend operator fun invoke(): Flow<Result<List<Entry>>> {
-        return repository.getTopEntries()
+    suspend operator fun invoke(after: String? = null, before: String? = null): Flow<Result<List<Entry>>> {
+        return repository.getTopEntries(after = after, before = before)
     }
 
 }

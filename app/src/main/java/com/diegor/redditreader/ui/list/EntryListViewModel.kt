@@ -27,14 +27,24 @@ class EntryListViewModel @ViewModelInject constructor(
     val errors: LiveData<Event<String>>
         get() = _errors
 
+    private val _loading = MutableLiveData<Boolean>()
+    val loading: LiveData<Boolean>
+        get() = _loading
+
     fun authenticateAndGetEntries() = viewModelScope.launch(Dispatchers.Default) {
         getAuthorizationUseCase().collect { result ->
             when (result) {
+                is Result.Loading -> {
+                    withContext(Dispatchers.Main) {
+                        _loading.value = true
+                    }
+                }
                 is Result.Success -> {
-                    getTopEntries()
+                    getStartingEntries()
                 }
                 is Result.Error -> {
                     withContext(Dispatchers.Main) {
+                        _loading.value = false
                         _errors.value = Event(result.exception.toString())
                     }
                 }
@@ -42,17 +52,84 @@ class EntryListViewModel @ViewModelInject constructor(
         }
     }
 
-    fun getTopEntries() = viewModelScope.launch(Dispatchers.Default)  {
+    private fun getStartingEntries() = viewModelScope.launch(Dispatchers.Default)  {
         getTopEntriesUseCase().collect { result ->
             when (result) {
+                is Result.Loading -> {
+                    withContext(Dispatchers.Main) {
+                        _loading.value = true
+                    }
+                }
                 is Result.Success -> {
                     withContext(Dispatchers.Main) {
-                        _entryList.value = result.data
+                        _loading.value = false
+                        _entryList.value = result.data.toMutableList()
                     }
                 }
                 is Result.Error -> {
                     withContext(Dispatchers.Main) {
+                        _loading.value = false
                         _errors.value = Event(result.exception.toString())
+                    }
+                }
+            }
+        }
+    }
+
+    fun onBottomReached() = viewModelScope.launch(Dispatchers.Default) {
+        if (loading.value == true) return@launch
+
+        entryList.value?.last()?.let {
+            getTopEntriesUseCase(after = it.name).collect { result ->
+                when (result) {
+                    is Result.Loading -> {
+                        withContext(Dispatchers.Main) {
+                            _loading.value = true
+                        }
+                    }
+                    is Result.Success -> {
+                        val list = _entryList.value?.toMutableList() ?: mutableListOf()
+                        list.addAll(result.data)
+                        withContext(Dispatchers.Main) {
+                            _loading.value = false
+                            _entryList.value = list
+                        }
+                    }
+                    is Result.Error -> {
+                        withContext(Dispatchers.Main) {
+                            _loading.value = false
+                            _errors.value = Event(result.exception.toString())
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fun onRefreshTop() = viewModelScope.launch(Dispatchers.Default) {
+        if (loading.value == true) return@launch
+
+        entryList.value?.first()?.let {
+            getTopEntriesUseCase(before = it.name).collect { result ->
+                when (result) {
+                    is Result.Loading -> {
+                        withContext(Dispatchers.Main) {
+                            _loading.value = true
+                        }
+                    }
+                    is Result.Success -> {
+                        val list = _entryList.value?.toMutableList() ?: mutableListOf()
+                        list.addAll(0, result.data)
+                        withContext(Dispatchers.Main) {
+                            _loading.value = false
+                            _entryList.value = list
+                        }
+                    }
+                    is Result.Error -> {
+                        withContext(Dispatchers.Main) {
+                            _loading.value = false
+                            _errors.value = Event(result.exception.toString())
+                        }
                     }
                 }
             }

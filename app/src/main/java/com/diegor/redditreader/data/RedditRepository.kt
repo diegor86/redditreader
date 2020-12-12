@@ -15,10 +15,10 @@ class RedditRepository @Inject constructor(
     private val authorizationService: AuthorizationService
 ) {
 
-    suspend fun getTopEntries(): Flow<Result<List<Entry>>> = flow {
+    suspend fun getTopEntries(after: String? = null, before: String? = null): Flow<Result<List<Entry>>> = flow {
         emit(Result.Loading)
 
-        val response = redditService.getTopEntries()
+        val response = redditService.getTopEntries(after = after, before = before)
 
         if (response.isSuccessful) {
             emit(Result.Success(response.body()!!.data.children.map { it.entry }))

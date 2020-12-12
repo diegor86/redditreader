@@ -8,7 +8,9 @@ import retrofit2.http.Query
 interface RedditService {
     @GET("top")
     suspend fun getTopEntries(@Query("limit") limit: Int = 25,
-                              @Query("show") show: String = "all"
+                              @Query("show") show: String = "all",
+                              @Query("after") after: String? = null,
+                              @Query("before") before: String? = null
     ): Response<Page>
 
     companion object {
