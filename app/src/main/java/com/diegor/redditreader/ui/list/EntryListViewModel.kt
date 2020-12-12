@@ -4,6 +4,7 @@ import androidx.hilt.Assisted
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.diegor.redditreader.data.entities.Entry
+import com.diegor.redditreader.domain.GetAuthorizationUseCase
 import com.diegor.redditreader.domain.GetTopEntriesUseCase
 import com.diegor.redditreader.util.result.Event
 import com.diegor.redditreader.util.result.Result
@@ -14,6 +15,7 @@ import kotlinx.coroutines.withContext
 
 class EntryListViewModel @ViewModelInject constructor(
     private val getTopEntriesUseCase: GetTopEntriesUseCase,
+    private val getAuthorizationUseCase: GetAuthorizationUseCase,
     @Assisted private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -24,6 +26,21 @@ class EntryListViewModel @ViewModelInject constructor(
     private val _errors = MutableLiveData<Event<String>>()
     val errors: LiveData<Event<String>>
         get() = _errors
+
+    fun authenticateAndGetEntries() = viewModelScope.launch(Dispatchers.Default) {
+        getAuthorizationUseCase().collect { result ->
+            when (result) {
+                is Result.Success -> {
+                    getTopEntries()
+                }
+                is Result.Error -> {
+                    withContext(Dispatchers.Main) {
+                        _errors.value = Event(result.exception.toString())
+                    }
+                }
+            }
+        }
+    }
 
     fun getTopEntries() = viewModelScope.launch(Dispatchers.Default)  {
         getTopEntriesUseCase().collect { result ->

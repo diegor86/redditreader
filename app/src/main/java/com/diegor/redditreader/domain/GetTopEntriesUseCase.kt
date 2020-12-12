@@ -1,6 +1,6 @@
 package com.diegor.redditreader.domain
 
-import com.diegor.redditreader.data.api.RedditRepository
+import com.diegor.redditreader.data.RedditRepository
 import com.diegor.redditreader.data.entities.Entry
 import com.diegor.redditreader.util.result.Result
 import kotlinx.coroutines.flow.Flow

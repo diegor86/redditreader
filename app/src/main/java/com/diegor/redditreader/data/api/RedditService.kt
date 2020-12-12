@@ -10,4 +10,8 @@ interface RedditService {
     suspend fun getTopEntries(@Query("limit") limit: Int = 25,
                               @Query("show") show: String = "all"
     ): Response<Page>
+
+    companion object {
+        const val REDDIT_BASE_URL = "https://oauth.reddit.com"
+    }
 }

@@ -74,7 +74,7 @@ class ItemListActivity : AppCompatActivity() {
         viewModel.entryList.observe(this, entriesObserver)
         viewModel.errors.observe(this, errorObserver)
 
-        viewModel.getTopEntries()
+        viewModel.authenticateAndGetEntries()
     }
 
     private fun setupRecyclerView(recyclerView: RecyclerView) {
