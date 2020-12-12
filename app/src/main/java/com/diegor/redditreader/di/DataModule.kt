@@ -10,6 +10,7 @@ import com.diegor.redditreader.data.api.RedditService
 import com.diegor.redditreader.data.api.RedditService.Companion.REDDIT_BASE_URL
 import com.diegor.redditreader.di.qualifiers.AuthOkHttpClient
 import com.diegor.redditreader.di.qualifiers.RedditOkHttpClient
+import com.diegor.redditreader.util.result.DateTypeAdapter
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -22,6 +23,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.*
 import javax.inject.Singleton
 
 @Module
@@ -31,6 +33,8 @@ object DataModule {
     @Provides
     fun provideGson(): Gson {
         val builder = GsonBuilder()
+            .registerTypeAdapter(Date::class.java, DateTypeAdapter())
+
         return builder.create()
     }
 
@@ -89,12 +93,13 @@ object DataModule {
     @Provides
     @Singleton
     fun provideRedditService(
+        gson: Gson,
         @RedditOkHttpClient okHttpClient: OkHttpClient
     ): RedditService {
         return Retrofit.Builder()
             .baseUrl(REDDIT_BASE_URL)
             .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
             .create(RedditService::class.java)
     }

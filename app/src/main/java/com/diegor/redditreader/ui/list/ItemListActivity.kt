@@ -13,6 +13,7 @@ import androidx.lifecycle.Observer
 import com.diegor.redditreader.ui.detail.ItemDetailActivity
 import com.diegor.redditreader.R
 import com.diegor.redditreader.data.entities.Entry
+import com.diegor.redditreader.ui.util.MarginDecorator
 
 import com.diegor.redditreader.util.result.EventObserver
 import dagger.hilt.android.AndroidEntryPoint
@@ -78,6 +79,7 @@ class ItemListActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView(recyclerView: RecyclerView) {
+        recyclerView.addItemDecoration(MarginDecorator(this, R.dimen.recycler_item_margin))
         adapter = EntryRecyclerViewAdapter(
             this,
             twoPane

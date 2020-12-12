@@ -14,6 +14,8 @@ import com.diegor.redditreader.data.entities.Entry
 import com.diegor.redditreader.dummy.DummyContent
 import com.diegor.redditreader.ui.detail.ItemDetailActivity
 import com.diegor.redditreader.ui.detail.ItemDetailFragment
+import com.diegor.redditreader.util.result.formatTimeAgo
+import com.facebook.drawee.view.SimpleDraweeView
 
 class EntryRecyclerViewAdapter(private val parentActivity: ItemListActivity,
                                private val twoPane: Boolean) :
@@ -54,8 +56,11 @@ class EntryRecyclerViewAdapter(private val parentActivity: ItemListActivity,
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = currentList[position]
-        holder.idView.text = item.name
-        holder.contentView.text = item.title
+        holder.author.text = item.author
+        holder.title.text = item.title
+        holder.created.text = item.created.formatTimeAgo(holder.itemView.context)
+        holder.comments.text = holder.itemView.context.resources.getQuantityString(R.plurals.number_of_comments, item.comments, item.comments)
+        holder.thumbnail.setImageURI(item.thumbnail)
 
         with(holder.itemView) {
             tag = item
@@ -66,11 +71,24 @@ class EntryRecyclerViewAdapter(private val parentActivity: ItemListActivity,
     override fun getItemCount() = currentList.size
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val idView: TextView = view.findViewById(
-            R.id.id_text
+        val title: TextView = view.findViewById(
+            R.id.entry_title
         )
-        val contentView: TextView = view.findViewById(
-            R.id.content
+
+        val author: TextView = view.findViewById(
+            R.id.entry_author
+        )
+
+        val created: TextView = view.findViewById(
+            R.id.created
+        )
+
+        val comments: TextView = view.findViewById(
+            R.id.comments
+        )
+
+        val thumbnail: SimpleDraweeView = view.findViewById(
+            R.id.entry_thumbnail
         )
     }
 
