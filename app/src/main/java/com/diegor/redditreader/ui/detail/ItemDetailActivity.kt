@@ -7,6 +7,7 @@ import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import android.view.MenuItem
 import com.diegor.redditreader.R
+import com.diegor.redditreader.data.entities.Entry
 import com.diegor.redditreader.ui.list.ItemListActivity
 
 /**
@@ -45,9 +46,9 @@ class ItemDetailActivity : AppCompatActivity() {
             val fragment = ItemDetailFragment()
                 .apply {
                 arguments = Bundle().apply {
-                    putString(
-                        ItemDetailFragment.ARG_ITEM_ID,
-                            intent.getStringExtra(ItemDetailFragment.ARG_ITEM_ID))
+                    putParcelable(
+                        ItemDetailFragment.ENTRY_ITEM,
+                            intent.getParcelableExtra<Entry>(ItemDetailFragment.ENTRY_ITEM))
                 }
             }
 

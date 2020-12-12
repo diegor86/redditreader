@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.diegor.redditreader.R
 import com.diegor.redditreader.data.entities.Entry
-import com.diegor.redditreader.dummy.DummyContent
 import com.diegor.redditreader.ui.detail.ItemDetailActivity
 import com.diegor.redditreader.ui.detail.ItemDetailFragment
 import com.diegor.redditreader.util.result.formatTimeAgo
@@ -25,11 +24,13 @@ class EntryRecyclerViewAdapter(private val parentActivity: ItemListActivity,
 
     init {
         onClickListener = View.OnClickListener { v ->
+            val entry = v.tag as? Entry
+
             if (twoPane) {
                 val fragment = ItemDetailFragment()
                     .apply {
                     arguments = Bundle().apply {
-                        putString(ItemDetailFragment.ARG_ITEM_ID, DummyContent.ITEMS.first().id)
+                        putParcelable(ItemDetailFragment.ENTRY_ITEM, entry)
                     }
                 }
                 parentActivity.supportFragmentManager
@@ -41,7 +42,7 @@ class EntryRecyclerViewAdapter(private val parentActivity: ItemListActivity,
                     v.context,
                     ItemDetailActivity::class.java
                 ).apply {
-                    putExtra(ItemDetailFragment.ARG_ITEM_ID, DummyContent.ITEMS.first().id)
+                    putExtra(ItemDetailFragment.ENTRY_ITEM, entry)
                 }
                 v.context.startActivity(intent)
             }

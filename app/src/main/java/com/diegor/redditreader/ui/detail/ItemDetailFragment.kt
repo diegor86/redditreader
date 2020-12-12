@@ -8,7 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.diegor.redditreader.R
-import com.diegor.redditreader.dummy.DummyContent
+import com.diegor.redditreader.data.entities.Entry
+import com.facebook.drawee.view.SimpleDraweeView
 
 /**
  * A fragment representing a single Item detail screen.
@@ -21,18 +22,18 @@ class ItemDetailFragment : Fragment() {
     /**
      * The dummy content this fragment is presenting.
      */
-    private var item: DummyContent.DummyItem? = null
+    private var item: Entry? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         arguments?.let {
-            if (it.containsKey(ARG_ITEM_ID)) {
+            if (it.containsKey(ENTRY_ITEM)) {
                 // Load the dummy content specified by the fragment
                 // arguments. In a real-world scenario, use a Loader
                 // to load content from a content provider.
-                item = DummyContent.ITEM_MAP[it.getString(ARG_ITEM_ID)]
-                activity?.findViewById<CollapsingToolbarLayout>(R.id.toolbar_layout)?.title = item?.content
+                item = it.getParcelable(ENTRY_ITEM)
+                activity?.findViewById<CollapsingToolbarLayout>(R.id.toolbar_layout)?.title = item?.author
             }
         }
     }
@@ -41,9 +42,9 @@ class ItemDetailFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.item_detail, container, false)
 
-        // Show the dummy content as text in a TextView.
         item?.let {
-            rootView.findViewById<TextView>(R.id.item_detail).text = it.details
+            rootView.findViewById<TextView>(R.id.entry_title).text = it.title
+            rootView.findViewById<SimpleDraweeView>(R.id.entry_thumbnail).setImageURI(it.thumbnail)
         }
 
         return rootView
@@ -54,6 +55,6 @@ class ItemDetailFragment : Fragment() {
          * The fragment argument representing the item ID that this fragment
          * represents.
          */
-        const val ARG_ITEM_ID = "item_id"
+        const val ENTRY_ITEM = "entry_item"
     }
 }
