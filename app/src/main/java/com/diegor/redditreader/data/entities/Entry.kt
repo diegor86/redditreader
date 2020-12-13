@@ -13,5 +13,6 @@ data class Entry(
     @SerializedName("num_comments") val comments: Int,
     @SerializedName("name") val name: String,
     @SerializedName("created") val created: Date,
-    @SerializedName("url") val url: String?
+    @SerializedName("url") val url: String?,
+    @Transient var markedAsRead: Boolean = false
 ) : Parcelable

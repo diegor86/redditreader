@@ -1,7 +1,6 @@
 package com.diegor.redditreader.ui.list
 
-import android.content.Intent
-import android.os.Bundle
+import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,13 +10,14 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.diegor.redditreader.R
 import com.diegor.redditreader.data.entities.Entry
-import com.diegor.redditreader.ui.detail.ItemDetailActivity
-import com.diegor.redditreader.ui.detail.ItemDetailFragment
 import com.diegor.redditreader.util.result.formatTimeAgo
 import com.facebook.drawee.view.SimpleDraweeView
 
-class EntryRecyclerViewAdapter(private val parentActivity: ItemListActivity,
-                               private val twoPane: Boolean) :
+interface OnEntryTappedListener {
+    fun onEntryTapped(entry: Entry)
+}
+
+class EntryRecyclerViewAdapter(private val onEntryTappedListener: OnEntryTappedListener?) :
         ListAdapter<Entry, EntryRecyclerViewAdapter.ViewHolder>(createEntryDiffCallback()) {
 
     private val onClickListener: View.OnClickListener
@@ -26,25 +26,8 @@ class EntryRecyclerViewAdapter(private val parentActivity: ItemListActivity,
         onClickListener = View.OnClickListener { v ->
             val entry = v.tag as? Entry
 
-            if (twoPane) {
-                val fragment = ItemDetailFragment()
-                    .apply {
-                    arguments = Bundle().apply {
-                        putParcelable(ItemDetailFragment.ENTRY_ITEM, entry)
-                    }
-                }
-                parentActivity.supportFragmentManager
-                        .beginTransaction()
-                        .replace(R.id.item_detail_container, fragment)
-                        .commit()
-            } else {
-                val intent = Intent(
-                    v.context,
-                    ItemDetailActivity::class.java
-                ).apply {
-                    putExtra(ItemDetailFragment.ENTRY_ITEM, entry)
-                }
-                v.context.startActivity(intent)
+            entry?.let {
+                onEntryTappedListener?.onEntryTapped(entry)
             }
         }
     }
@@ -59,6 +42,11 @@ class EntryRecyclerViewAdapter(private val parentActivity: ItemListActivity,
         val item = currentList[position]
         holder.author.text = item.author
         holder.title.text = item.title
+        if (item.markedAsRead) {
+            holder.title.typeface = Typeface.create(holder.title.typeface, Typeface.NORMAL)
+        } else {
+            holder.title.typeface = Typeface.create(holder.title.typeface, Typeface.BOLD)
+        }
         holder.created.text = item.created.formatTimeAgo(holder.itemView.context)
         holder.comments.text = holder.itemView.context.resources.getQuantityString(R.plurals.number_of_comments, item.comments, item.comments)
         holder.thumbnail.setImageURI(item.thumbnail)

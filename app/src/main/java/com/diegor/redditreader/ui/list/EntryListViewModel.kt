@@ -31,7 +31,13 @@ class EntryListViewModel @ViewModelInject constructor(
     val loading: LiveData<Boolean>
         get() = _loading
 
+    private val _showDetail = MutableLiveData<Event<Entry>>()
+    val showDetail: LiveData<Event<Entry>>
+        get() = _showDetail
+
     fun authenticateAndGetEntries() = viewModelScope.launch(Dispatchers.Default) {
+        if (_entryList.value != null) return@launch
+
         getAuthorizationUseCase().collect { result ->
             when (result) {
                 is Result.Loading -> {
@@ -132,6 +138,25 @@ class EntryListViewModel @ViewModelInject constructor(
                         }
                     }
                 }
+            }
+        }
+    }
+
+    fun onEntryTapped(entry: Entry) = viewModelScope.launch(Dispatchers.Default) {
+        val list = _entryList.value?.toMutableList()
+
+        var updated: Entry? = null
+
+        list?.indexOf(entry)?.let {
+            updated = entry.copy()
+            updated?.markedAsRead = true
+            list.set(it, updated!!)
+        }
+
+        list?.let {
+            withContext(Dispatchers.Main) {
+                _entryList.value = it
+                updated?.let { _showDetail.value = Event(it) }
             }
         }
     }

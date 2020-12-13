@@ -1,5 +1,6 @@
 package com.diegor.redditreader.ui.list
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.core.widget.NestedScrollView
 import androidx.appcompat.app.AppCompatActivity
@@ -15,6 +16,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.diegor.redditreader.ui.detail.ItemDetailActivity
 import com.diegor.redditreader.R
 import com.diegor.redditreader.data.entities.Entry
+import com.diegor.redditreader.ui.detail.ItemDetailFragment
 import com.diegor.redditreader.ui.util.InfiniteScrollListener
 import com.diegor.redditreader.ui.util.MarginDecorator
 import com.diegor.redditreader.ui.util.ScrollListener
@@ -60,6 +62,29 @@ class ItemListActivity : AppCompatActivity(), InfiniteScrollListener {
         Toast.makeText(this, error, Toast.LENGTH_LONG).show()
     }
 
+    private val showDetailObserver = EventObserver<Entry> { entry ->
+        if (twoPane) {
+            val fragment = ItemDetailFragment()
+                .apply {
+                    arguments = Bundle().apply {
+                        putParcelable(ItemDetailFragment.ENTRY_ITEM, entry)
+                    }
+                }
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.item_detail_container, fragment)
+                .commit()
+        } else {
+            val intent = Intent(
+                this,
+                ItemDetailActivity::class.java
+            ).apply {
+                putExtra(ItemDetailFragment.ENTRY_ITEM, entry)
+            }
+            startActivity(intent)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_item_list)
@@ -91,6 +116,7 @@ class ItemListActivity : AppCompatActivity(), InfiniteScrollListener {
         viewModel.entryList.observe(this, entriesObserver)
         viewModel.loading.observe(this, loadingObserver)
         viewModel.errors.observe(this, errorObserver)
+        viewModel.showDetail.observe(this, showDetailObserver)
 
         viewModel.authenticateAndGetEntries()
     }
@@ -98,10 +124,11 @@ class ItemListActivity : AppCompatActivity(), InfiniteScrollListener {
     private fun setupRecyclerView(recyclerView: RecyclerView) {
         recyclerView.addItemDecoration(MarginDecorator(this, R.dimen.recycler_item_margin))
         recyclerView.addOnScrollListener(ScrollListener(this, recyclerView.layoutManager as LinearLayoutManager))
-        adapter = EntryRecyclerViewAdapter(
-            this,
-            twoPane
-        )
+        adapter = EntryRecyclerViewAdapter(object : OnEntryTappedListener {
+            override fun onEntryTapped(entry: Entry) {
+                viewModel.onEntryTapped(entry)
+            }
+        })
 
         recyclerView.adapter = adapter
     }
