@@ -8,6 +8,8 @@ import com.diegor.redditreader.data.api.AuthorizationService.Companion.REDDIT_AP
 import com.diegor.redditreader.data.api.AuthorizationService.Companion.AUTH_BASE_URL
 import com.diegor.redditreader.data.api.RedditService
 import com.diegor.redditreader.data.api.RedditService.Companion.REDDIT_BASE_URL
+import com.diegor.redditreader.data.local.LocalSourceProvider
+import com.diegor.redditreader.data.local.LocalSourceProviderImpl
 import com.diegor.redditreader.di.qualifiers.AuthOkHttpClient
 import com.diegor.redditreader.di.qualifiers.RedditOkHttpClient
 import com.diegor.redditreader.util.result.DateTypeAdapter
@@ -121,5 +123,11 @@ object DataModule {
     @Singleton
     fun provideAuthorizationHolder(): AuthorizationHolder {
         return AuthorizationHolderImpl
+    }
+
+    @Provides
+    @Singleton
+    fun provideLocalSourceProvider(): LocalSourceProvider {
+        return LocalSourceProviderImpl()
     }
 }

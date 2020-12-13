@@ -110,7 +110,7 @@ class ItemListActivity : AppCompatActivity(), InfiniteScrollListener {
 
         swipeRefreshLayout = findViewById(R.id.swipe_refresh)
         swipeRefreshLayout.setOnRefreshListener {
-            viewModel.onRefreshTop()
+            viewModel.refreshNewEntries()
         }
 
         viewModel.entryList.observe(this, entriesObserver)
@@ -134,6 +134,6 @@ class ItemListActivity : AppCompatActivity(), InfiniteScrollListener {
     }
 
     override fun onReachedBottom() {
-        viewModel.onBottomReached()
+        viewModel.getOlderEntries()
     }
 }

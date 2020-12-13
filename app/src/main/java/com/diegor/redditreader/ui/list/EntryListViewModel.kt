@@ -4,8 +4,7 @@ import androidx.hilt.Assisted
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.diegor.redditreader.data.entities.Entry
-import com.diegor.redditreader.domain.GetAuthorizationUseCase
-import com.diegor.redditreader.domain.GetTopEntriesUseCase
+import com.diegor.redditreader.domain.*
 import com.diegor.redditreader.util.result.Event
 import com.diegor.redditreader.util.result.Result
 import kotlinx.coroutines.flow.collect
@@ -14,8 +13,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class EntryListViewModel @ViewModelInject constructor(
-    private val getTopEntriesUseCase: GetTopEntriesUseCase,
+    private val getInitialEntriesUseCase: GetInitialEntriesUseCase,
+    private val getOlderEntriesUseCase: GetOlderEntriesUseCase,
+    private val refreshNewEntriesUseCase: RefreshNewEntriesUseCase,
     private val getAuthorizationUseCase: GetAuthorizationUseCase,
+    private val markEntryAsReadUseCase: MarkEntryAsReadUseCase,
     @Assisted private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -59,105 +61,54 @@ class EntryListViewModel @ViewModelInject constructor(
     }
 
     private fun getStartingEntries() = viewModelScope.launch(Dispatchers.Default)  {
-        getTopEntriesUseCase().collect { result ->
-            when (result) {
-                is Result.Loading -> {
-                    withContext(Dispatchers.Main) {
-                        _loading.value = true
-                    }
+        getInitialEntriesUseCase().collect { result ->
+            showEntriesResult(result)
+        }
+    }
+
+    private suspend fun showEntriesResult(result: Result<List<Entry>>) {
+        when (result) {
+            is Result.Loading -> {
+                withContext(Dispatchers.Main) {
+                    _loading.value = true
                 }
-                is Result.Success -> {
-                    withContext(Dispatchers.Main) {
-                        _loading.value = false
-                        _entryList.value = result.data.toMutableList()
-                    }
+            }
+            is Result.Success -> {
+                withContext(Dispatchers.Main) {
+                    _loading.value = false
+                    _entryList.value = result.data
                 }
-                is Result.Error -> {
-                    withContext(Dispatchers.Main) {
-                        _loading.value = false
-                        _errors.value = Event(result.exception.toString())
-                    }
+            }
+            is Result.Error -> {
+                withContext(Dispatchers.Main) {
+                    _loading.value = false
+                    _errors.value = Event(result.exception.toString())
                 }
             }
         }
     }
 
-    fun onBottomReached() = viewModelScope.launch(Dispatchers.Default) {
+    fun getOlderEntries() = viewModelScope.launch(Dispatchers.Default)  {
         if (loading.value == true) return@launch
 
-        entryList.value?.last()?.let {
-            getTopEntriesUseCase(after = it.name).collect { result ->
-                when (result) {
-                    is Result.Loading -> {
-                        withContext(Dispatchers.Main) {
-                            _loading.value = true
-                        }
-                    }
-                    is Result.Success -> {
-                        val list = _entryList.value?.toMutableList() ?: mutableListOf()
-                        list.addAll(result.data)
-                        withContext(Dispatchers.Main) {
-                            _loading.value = false
-                            _entryList.value = list
-                        }
-                    }
-                    is Result.Error -> {
-                        withContext(Dispatchers.Main) {
-                            _loading.value = false
-                            _errors.value = Event(result.exception.toString())
-                        }
-                    }
-                }
-            }
+        getOlderEntriesUseCase().collect { result ->
+            showEntriesResult(result)
         }
     }
 
-    fun onRefreshTop() = viewModelScope.launch(Dispatchers.Default) {
+    fun refreshNewEntries() = viewModelScope.launch(Dispatchers.Default)  {
         if (loading.value == true) return@launch
 
-        entryList.value?.first()?.let {
-            getTopEntriesUseCase(before = it.name).collect { result ->
-                when (result) {
-                    is Result.Loading -> {
-                        withContext(Dispatchers.Main) {
-                            _loading.value = true
-                        }
-                    }
-                    is Result.Success -> {
-                        val list = _entryList.value?.toMutableList() ?: mutableListOf()
-                        list.addAll(0, result.data)
-                        withContext(Dispatchers.Main) {
-                            _loading.value = false
-                            _entryList.value = list
-                        }
-                    }
-                    is Result.Error -> {
-                        withContext(Dispatchers.Main) {
-                            _loading.value = false
-                            _errors.value = Event(result.exception.toString())
-                        }
-                    }
-                }
-            }
+        refreshNewEntriesUseCase().collect { result ->
+            showEntriesResult(result)
         }
     }
 
     fun onEntryTapped(entry: Entry) = viewModelScope.launch(Dispatchers.Default) {
-        val list = _entryList.value?.toMutableList()
+        val list = markEntryAsReadUseCase(entry)
 
-        var updated: Entry? = null
-
-        list?.indexOf(entry)?.let {
-            updated = entry.copy()
-            updated?.markedAsRead = true
-            list.set(it, updated!!)
-        }
-
-        list?.let {
-            withContext(Dispatchers.Main) {
-                _entryList.value = it
-                updated?.let { _showDetail.value = Event(it) }
-            }
+        withContext(Dispatchers.Main) {
+            _entryList.value = list
         }
     }
 }

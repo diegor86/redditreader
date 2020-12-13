@@ -14,5 +14,5 @@ data class Entry(
     @SerializedName("name") val name: String,
     @SerializedName("created") val created: Date,
     @SerializedName("url") val url: String?,
-    @Transient var markedAsRead: Boolean = false
+    @Transient val markedAsRead: Boolean = false
 ) : Parcelable

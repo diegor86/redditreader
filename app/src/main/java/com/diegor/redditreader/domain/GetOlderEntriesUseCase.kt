@@ -6,12 +6,11 @@ import com.diegor.redditreader.util.result.Result
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetTopEntriesUseCase @Inject constructor(
+class GetOlderEntriesUseCase @Inject constructor(
     private val repository: RedditRepository
 ) {
 
-    suspend operator fun invoke(after: String? = null, before: String? = null): Flow<Result<List<Entry>>> {
-        return repository.getTopEntries(after = after, before = before)
+    suspend operator fun invoke(): Flow<Result<List<Entry>>> {
+        return repository.getAfterEntries()
     }
-
 }
