@@ -19,9 +19,6 @@ import com.facebook.drawee.view.SimpleDraweeView
  */
 class ItemDetailFragment : Fragment() {
 
-    /**
-     * The dummy content this fragment is presenting.
-     */
     private var item: Entry? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {

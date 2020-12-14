@@ -9,6 +9,7 @@ import javax.inject.Inject
 
 class GetAuthorizationUseCase @Inject constructor(
     private val authorizationHolder: AuthorizationHolder,
+    private val getDeviceIdUseCase: GetDeviceIdUseCase,
     private val repository: RedditRepository
 ) {
 
@@ -18,7 +19,7 @@ class GetAuthorizationUseCase @Inject constructor(
             emit(Result.Success(it))
         } ?: run {
             emit(Result.Loading)
-            val result = repository.getAuthorization(DEVICE_ID)
+            val result = repository.getAuthorization(getDeviceIdUseCase())
 
             if (result is Result.Success) {
                 authorizationHolder.authorization = result.data
@@ -26,10 +27,5 @@ class GetAuthorizationUseCase @Inject constructor(
 
             emit(result)
         }
-    }
-
-    companion object {
-        // TODO hardcoded ATM
-        private const val DEVICE_ID = "9537d868-b682-4afe-a0d2-ec83453e0bce"
     }
 }

@@ -3,11 +3,12 @@ package com.diegor.redditreader.data
 import android.content.Context
 import androidx.core.content.edit
 import androidx.preference.PreferenceManager
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SimpleStorageRepository @Inject constructor(appContext: Context) {
+class SimpleStorageRepository @Inject constructor(@ApplicationContext appContext: Context) {
     private val sharedPreferences by lazy {
         PreferenceManager.getDefaultSharedPreferences(appContext)
     }
