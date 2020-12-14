@@ -18,6 +18,7 @@ class EntryListViewModel @ViewModelInject constructor(
     private val refreshNewEntriesUseCase: RefreshNewEntriesUseCase,
     private val getAuthorizationUseCase: GetAuthorizationUseCase,
     private val markEntryAsReadUseCase: MarkEntryAsReadUseCase,
+    private val dismissAllEntriesUseCase: DismissAllEntriesUseCase,
     @Assisted private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -106,6 +107,15 @@ class EntryListViewModel @ViewModelInject constructor(
 
     fun onEntryTapped(entry: Entry) = viewModelScope.launch(Dispatchers.Default) {
         val list = markEntryAsReadUseCase(entry)
+
+        withContext(Dispatchers.Main) {
+            _entryList.value = list
+            _showDetail.value = Event(entry)
+        }
+    }
+
+    fun dismissAllEntries() = viewModelScope.launch(Dispatchers.Default) {
+        val list = dismissAllEntriesUseCase()
 
         withContext(Dispatchers.Main) {
             _entryList.value = list

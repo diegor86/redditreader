@@ -12,4 +12,5 @@ interface LocalSourceProvider {
     fun markEntryAsRead(entry: Entry)
     fun storeInitialEntries(page: PageData)
     fun hasEntries(): Boolean
+    fun dismissAllEntries()
 }
