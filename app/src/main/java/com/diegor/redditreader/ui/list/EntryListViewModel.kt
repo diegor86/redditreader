@@ -19,6 +19,7 @@ class EntryListViewModel @ViewModelInject constructor(
     private val getAuthorizationUseCase: GetAuthorizationUseCase,
     private val markEntryAsReadUseCase: MarkEntryAsReadUseCase,
     private val dismissAllEntriesUseCase: DismissAllEntriesUseCase,
+    private val dismissEntryUseCase: DismissEntryUseCase,
     @Assisted private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -116,6 +117,14 @@ class EntryListViewModel @ViewModelInject constructor(
 
     fun dismissAllEntries() = viewModelScope.launch(Dispatchers.Default) {
         val list = dismissAllEntriesUseCase()
+
+        withContext(Dispatchers.Main) {
+            _entryList.value = list
+        }
+    }
+
+    fun dismissEntry(entry: Entry) = viewModelScope.launch(Dispatchers.Default) {
+        val list = dismissEntryUseCase(entry)
 
         withContext(Dispatchers.Main) {
             _entryList.value = list

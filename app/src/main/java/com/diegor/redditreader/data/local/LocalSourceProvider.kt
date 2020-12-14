@@ -13,4 +13,5 @@ interface LocalSourceProvider {
     fun storeInitialEntries(page: PageData)
     fun hasEntries(): Boolean
     fun dismissAllEntries()
+    fun dismissEntry(entry: Entry)
 }

@@ -48,4 +48,8 @@ class LocalSourceProviderImpl : LocalSourceProvider {
     }
 
     override fun dismissAllEntries() = entries.clear()
+
+    override fun dismissEntry(entry: Entry) {
+        entries.remove(entry)
+    }
 }

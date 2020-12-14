@@ -85,6 +85,12 @@ class RedditRepository @Inject constructor(
         return localSourceProvider.getEntries()
     }
 
+    suspend fun dismissEntry(entry: Entry): List<Entry> {
+        localSourceProvider.dismissEntry(entry)
+
+        return localSourceProvider.getEntries()
+    }
+
     suspend fun getAuthorization(deviceId: String): Result<String> {
 
         val response = authorizationService.getAuthorization(deviceId)

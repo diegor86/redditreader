@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.appcompat.widget.Toolbar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
@@ -33,7 +32,7 @@ import dagger.hilt.android.AndroidEntryPoint
  * item details side-by-side using two vertical panes.
  */
 @AndroidEntryPoint
-class ItemListActivity : AppCompatActivity(), InfiniteScrollListener {
+class ItemListActivity : AppCompatActivity(), InfiniteScrollListener, OnEntryTappedListener {
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -123,13 +122,17 @@ class ItemListActivity : AppCompatActivity(), InfiniteScrollListener {
     private fun setupRecyclerView(recyclerView: RecyclerView) {
         recyclerView.addItemDecoration(MarginDecorator(this, R.dimen.recycler_item_margin))
         recyclerView.addOnScrollListener(ScrollListener(this, recyclerView.layoutManager as LinearLayoutManager))
-        adapter = EntryRecyclerViewAdapter(object : OnEntryTappedListener {
-            override fun onEntryTapped(entry: Entry) {
-                viewModel.onEntryTapped(entry)
-            }
-        })
+        adapter = EntryRecyclerViewAdapter(this)
 
         recyclerView.adapter = adapter
+    }
+
+    override fun onEntryTapped(entry: Entry) {
+        viewModel.onEntryTapped(entry)
+    }
+
+    override fun onEntryDismissed(entry: Entry) {
+        viewModel.dismissEntry(entry)
     }
 
     override fun onReachedBottom() {

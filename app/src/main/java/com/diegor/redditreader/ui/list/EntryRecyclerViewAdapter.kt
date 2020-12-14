@@ -4,6 +4,7 @@ import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -15,6 +16,7 @@ import com.facebook.drawee.view.SimpleDraweeView
 
 interface OnEntryTappedListener {
     fun onEntryTapped(entry: Entry)
+    fun onEntryDismissed(entry: Entry)
 }
 
 class EntryRecyclerViewAdapter(private val onEntryTappedListener: OnEntryTappedListener?) :
@@ -51,6 +53,10 @@ class EntryRecyclerViewAdapter(private val onEntryTappedListener: OnEntryTappedL
         holder.comments.text = holder.itemView.context.resources.getQuantityString(R.plurals.number_of_comments, item.comments, item.comments)
         holder.thumbnail.setImageURI(item.thumbnail)
 
+        holder.dismiss.setOnClickListener {
+            onEntryTappedListener?.onEntryDismissed(item)
+        }
+
         with(holder.itemView) {
             tag = item
             setOnClickListener(onClickListener)
@@ -74,6 +80,10 @@ class EntryRecyclerViewAdapter(private val onEntryTappedListener: OnEntryTappedL
 
         val comments: TextView = view.findViewById(
             R.id.comments
+        )
+
+        val dismiss: ImageButton = view.findViewById(
+            R.id.dismiss_entry
         )
 
         val thumbnail: SimpleDraweeView = view.findViewById(
