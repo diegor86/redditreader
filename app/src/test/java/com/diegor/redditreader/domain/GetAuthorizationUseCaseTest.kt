@@ -127,6 +127,6 @@ class GetAuthorizationUseCaseTest {
 
         getAuthorizationUseCase().toList()
 
-        verify(authorizationHolder, never()).authorization = any()
+        verify(authorizationHolder, never()).authorization = anyOrNull()
     }
 }

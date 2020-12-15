@@ -45,7 +45,6 @@ object DataModule {
         return Interceptor { chain ->
             val requestBuilder = chain.request().newBuilder()
 
-            // TODO: Hardcoded ATM
             requestBuilder.addHeader("User-Agent", "redditReader by r/Geredis")
             requestBuilder.addHeader("Authorization", "bearer " + authorizationHolder.authorization)
 
