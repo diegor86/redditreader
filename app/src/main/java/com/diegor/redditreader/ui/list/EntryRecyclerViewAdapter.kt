@@ -17,6 +17,7 @@ import com.facebook.drawee.view.SimpleDraweeView
 interface OnEntryTappedListener {
     fun onEntryTapped(entry: Entry)
     fun onEntryDismissed(entry: Entry)
+    fun onThumbnailTapped(entry: Entry)
 }
 
 class EntryRecyclerViewAdapter(private val onEntryTappedListener: OnEntryTappedListener?) :
@@ -52,6 +53,10 @@ class EntryRecyclerViewAdapter(private val onEntryTappedListener: OnEntryTappedL
         holder.created.text = item.created.formatTimeAgo(holder.itemView.context)
         holder.comments.text = holder.itemView.context.resources.getQuantityString(R.plurals.number_of_comments, item.comments, item.comments)
         holder.thumbnail.setImageURI(item.thumbnail)
+
+        holder.thumbnail.setOnClickListener {
+            onEntryTappedListener?.onThumbnailTapped(item)
+        }
 
         holder.dismiss.setOnClickListener {
             onEntryTappedListener?.onEntryDismissed(item)

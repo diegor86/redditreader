@@ -1,26 +1,26 @@
 package com.diegor.redditreader.ui.list
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import androidx.core.widget.NestedScrollView
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.RecyclerView
-import androidx.appcompat.widget.Toolbar
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.diegor.redditreader.ui.detail.ItemDetailActivity
 import com.diegor.redditreader.R
 import com.diegor.redditreader.data.entities.Entry
+import com.diegor.redditreader.ui.detail.ItemDetailActivity
 import com.diegor.redditreader.ui.detail.ItemDetailFragment
 import com.diegor.redditreader.ui.util.InfiniteScrollListener
 import com.diegor.redditreader.ui.util.MarginDecorator
 import com.diegor.redditreader.ui.util.ScrollListener
-
 import com.diegor.redditreader.util.result.EventObserver
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -84,6 +84,12 @@ class ItemListActivity : AppCompatActivity(), InfiniteScrollListener, OnEntryTap
         }
     }
 
+    private val openUrlObserver = EventObserver<String> { url ->
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.data = Uri.parse(url)
+        startActivity(intent)
+    }
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_item_list)
@@ -115,6 +121,7 @@ class ItemListActivity : AppCompatActivity(), InfiniteScrollListener, OnEntryTap
         viewModel.loading.observe(this, loadingObserver)
         viewModel.errors.observe(this, errorObserver)
         viewModel.showDetail.observe(this, showDetailObserver)
+        viewModel.openUrl.observe(this, openUrlObserver)
 
         viewModel.authenticateAndGetEntries()
     }
@@ -133,6 +140,10 @@ class ItemListActivity : AppCompatActivity(), InfiniteScrollListener, OnEntryTap
 
     override fun onEntryDismissed(entry: Entry) {
         viewModel.dismissEntry(entry)
+    }
+
+    override fun onThumbnailTapped(entry: Entry) {
+        viewModel.onThumbnailTapped(entry)
     }
 
     override fun onReachedBottom() {

@@ -9,7 +9,6 @@ import com.diegor.redditreader.util.CoroutinesDispatcherProvider
 import com.diegor.redditreader.util.result.Event
 import com.diegor.redditreader.util.result.Result
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -40,6 +39,10 @@ class EntryListViewModel @ViewModelInject constructor(
     private val _showDetail = MutableLiveData<Event<Entry>>()
     val showDetail: LiveData<Event<Entry>>
         get() = _showDetail
+
+    private val _openUrl = MutableLiveData<Event<String>>()
+    val openUrl: LiveData<Event<String>>
+        get() = _openUrl
 
     fun authenticateAndGetEntries() = viewModelScope.launch(dispatcherProvider.computation) {
         if (_entryList.value != null) return@launch
@@ -130,6 +133,12 @@ class EntryListViewModel @ViewModelInject constructor(
 
         withContext(dispatcherProvider.main) {
             _entryList.value = list
+        }
+    }
+
+    fun onThumbnailTapped(entry: Entry) {
+        entry.url?.let {
+            _openUrl.value = Event(it)
         }
     }
 }
