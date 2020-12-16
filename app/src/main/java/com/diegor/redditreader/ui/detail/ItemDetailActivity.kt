@@ -9,6 +9,7 @@ import android.view.MenuItem
 import com.diegor.redditreader.R
 import com.diegor.redditreader.data.entities.Entry
 import com.diegor.redditreader.ui.list.ItemListActivity
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * An activity representing a single Item detail screen. This
@@ -16,6 +17,7 @@ import com.diegor.redditreader.ui.list.ItemListActivity
  * item details are presented side-by-side with a list of items
  * in a [ItemListActivity].
  */
+@AndroidEntryPoint
 class ItemDetailActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

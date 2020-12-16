@@ -7,9 +7,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import com.diegor.redditreader.R
 import com.diegor.redditreader.data.entities.Entry
 import com.facebook.drawee.view.SimpleDraweeView
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * A fragment representing a single Item detail screen.
@@ -17,21 +20,28 @@ import com.facebook.drawee.view.SimpleDraweeView
  * in two-pane mode (on tablets) or a [ItemDetailActivity]
  * on handsets.
  */
+@AndroidEntryPoint
 class ItemDetailFragment : Fragment() {
 
-    private var item: Entry? = null
+    private val viewModel by viewModels<EntryDetailViewModel>()
+
+    private lateinit var title: TextView
+    private lateinit var thumbnail: SimpleDraweeView
+
+    private val entryObserver = Observer<Entry> {
+        val entry = it ?: return@Observer
+
+        activity?.findViewById<CollapsingToolbarLayout>(R.id.toolbar_layout)?.title = entry.author
+        title.text = entry.title
+        thumbnail.setImageURI(entry.thumbnail)
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        arguments?.let {
-            if (it.containsKey(ENTRY_ITEM)) {
-                // Load the dummy content specified by the fragment
-                // arguments. In a real-world scenario, use a Loader
-                // to load content from a content provider.
-                item = it.getParcelable(ENTRY_ITEM)
-                activity?.findViewById<CollapsingToolbarLayout>(R.id.toolbar_layout)?.title = item?.author
-            }
+        arguments?.getParcelable<Entry>(ENTRY_ITEM)?.let {
+            viewModel.setEntry(it)
         }
     }
 
@@ -39,12 +49,16 @@ class ItemDetailFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.item_detail, container, false)
 
-        item?.let {
-            rootView.findViewById<TextView>(R.id.entry_title).text = it.title
-            rootView.findViewById<SimpleDraweeView>(R.id.entry_thumbnail).setImageURI(it.thumbnail)
-        }
+        title = rootView.findViewById(R.id.entry_title)
+        thumbnail = rootView.findViewById(R.id.entry_thumbnail)
 
         return rootView
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        viewModel.entry.observe(viewLifecycleOwner, entryObserver)
     }
 
     companion object {
