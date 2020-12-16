@@ -5,6 +5,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.diegor.redditreader.data.entities.Entry
 import com.diegor.redditreader.domain.*
+import com.diegor.redditreader.util.CoroutinesDispatcherProvider
 import com.diegor.redditreader.util.result.Event
 import com.diegor.redditreader.util.result.Result
 import kotlinx.coroutines.flow.collect
@@ -20,6 +21,7 @@ class EntryListViewModel @ViewModelInject constructor(
     private val markEntryAsReadUseCase: MarkEntryAsReadUseCase,
     private val dismissAllEntriesUseCase: DismissAllEntriesUseCase,
     private val dismissEntryUseCase: DismissEntryUseCase,
+    private val dispatcherProvider: CoroutinesDispatcherProvider,
     @Assisted private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -39,13 +41,13 @@ class EntryListViewModel @ViewModelInject constructor(
     val showDetail: LiveData<Event<Entry>>
         get() = _showDetail
 
-    fun authenticateAndGetEntries() = viewModelScope.launch(Dispatchers.Default) {
+    fun authenticateAndGetEntries() = viewModelScope.launch(dispatcherProvider.computation) {
         if (_entryList.value != null) return@launch
 
         getAuthorizationUseCase().collect { result ->
             when (result) {
                 is Result.Loading -> {
-                    withContext(Dispatchers.Main) {
+                    withContext(dispatcherProvider.main) {
                         _loading.value = true
                     }
                 }
@@ -53,7 +55,7 @@ class EntryListViewModel @ViewModelInject constructor(
                     getStartingEntries()
                 }
                 is Result.Error -> {
-                    withContext(Dispatchers.Main) {
+                    withContext(dispatcherProvider.main) {
                         _loading.value = false
                         _errors.value = Event(result.exception.toString())
                     }
@@ -62,7 +64,7 @@ class EntryListViewModel @ViewModelInject constructor(
         }
     }
 
-    private fun getStartingEntries() = viewModelScope.launch(Dispatchers.Default)  {
+    private fun getStartingEntries() = viewModelScope.launch(dispatcherProvider.computation)  {
         getInitialEntriesUseCase().collect { result ->
             showEntriesResult(result)
         }
@@ -71,18 +73,18 @@ class EntryListViewModel @ViewModelInject constructor(
     private suspend fun showEntriesResult(result: Result<List<Entry>>) {
         when (result) {
             is Result.Loading -> {
-                withContext(Dispatchers.Main) {
+                withContext(dispatcherProvider.main) {
                     _loading.value = true
                 }
             }
             is Result.Success -> {
-                withContext(Dispatchers.Main) {
+                withContext(dispatcherProvider.main) {
                     _loading.value = false
                     _entryList.value = result.data
                 }
             }
             is Result.Error -> {
-                withContext(Dispatchers.Main) {
+                withContext(dispatcherProvider.main) {
                     _loading.value = false
                     _errors.value = Event(result.exception.toString())
                 }
@@ -90,7 +92,7 @@ class EntryListViewModel @ViewModelInject constructor(
         }
     }
 
-    fun getOlderEntries() = viewModelScope.launch(Dispatchers.Default)  {
+    fun getOlderEntries() = viewModelScope.launch(dispatcherProvider.computation)  {
         if (loading.value == true) return@launch
 
         getOlderEntriesUseCase().collect { result ->
@@ -98,7 +100,7 @@ class EntryListViewModel @ViewModelInject constructor(
         }
     }
 
-    fun refreshNewEntries() = viewModelScope.launch(Dispatchers.Default)  {
+    fun refreshNewEntries() = viewModelScope.launch(dispatcherProvider.computation)  {
         if (loading.value == true) return@launch
 
         refreshNewEntriesUseCase().collect { result ->
@@ -106,27 +108,27 @@ class EntryListViewModel @ViewModelInject constructor(
         }
     }
 
-    fun onEntryTapped(entry: Entry) = viewModelScope.launch(Dispatchers.Default) {
+    fun onEntryTapped(entry: Entry) = viewModelScope.launch(dispatcherProvider.computation) {
         val list = markEntryAsReadUseCase(entry)
 
-        withContext(Dispatchers.Main) {
+        withContext(dispatcherProvider.main) {
             _entryList.value = list
             _showDetail.value = Event(entry)
         }
     }
 
-    fun dismissAllEntries() = viewModelScope.launch(Dispatchers.Default) {
+    fun dismissAllEntries() = viewModelScope.launch(dispatcherProvider.computation) {
         val list = dismissAllEntriesUseCase()
 
-        withContext(Dispatchers.Main) {
+        withContext(dispatcherProvider.main) {
             _entryList.value = list
         }
     }
 
-    fun dismissEntry(entry: Entry) = viewModelScope.launch(Dispatchers.Default) {
+    fun dismissEntry(entry: Entry) = viewModelScope.launch(dispatcherProvider.computation) {
         val list = dismissEntryUseCase(entry)
 
-        withContext(Dispatchers.Main) {
+        withContext(dispatcherProvider.main) {
             _entryList.value = list
         }
     }
