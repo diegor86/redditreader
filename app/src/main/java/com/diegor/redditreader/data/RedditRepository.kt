@@ -7,8 +7,7 @@ import com.diegor.redditreader.data.local.LocalSourceProvider
 import com.diegor.redditreader.util.result.Result
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import okhttp3.ResponseBody
-import java.lang.Exception
+import retrofit2.Response
 import javax.inject.Inject
 
 class RedditRepository @Inject constructor(
@@ -34,7 +33,7 @@ class RedditRepository @Inject constructor(
             emit(Result.Success(localSourceProvider.getEntries()))
         } else {
             response.errorBody()?.let {
-                emit(Result.Error(Exception(parseErrors(it))))
+                emit(Result.Error(Exception(parseErrors(response))))
             }
         }
     }
@@ -51,7 +50,7 @@ class RedditRepository @Inject constructor(
             emit(Result.Success(localSourceProvider.getEntries()))
         } else {
             response.errorBody()?.let {
-                emit(Result.Error(Exception(parseErrors(it))))
+                emit(Result.Error(Exception(parseErrors(response))))
             }
         }
     }
@@ -68,7 +67,7 @@ class RedditRepository @Inject constructor(
             emit(Result.Success(localSourceProvider.getEntries()))
         } else {
             response.errorBody()?.let {
-                emit(Result.Error(Exception(parseErrors(it))))
+                emit(Result.Error(Exception(parseErrors(response))))
             }
         }
     }
@@ -95,21 +94,14 @@ class RedditRepository @Inject constructor(
 
         val response = authorizationService.getAuthorization(deviceId)
 
-        if (response.isSuccessful) {
-            return Result.Success(response.body()!!.accessToken)
+        return if (response.isSuccessful) {
+            Result.Success(response.body()!!.accessToken)
         } else {
-            response.errorBody()?.let {
-                return Result.Error(Exception(parseErrors(it)))
-            } ?: run {
-                return Result.Error(Exception("Unknown error"))
-            }
+            Result.Error(Exception(parseErrors(response)))
         }
     }
 
-    private fun parseErrors(errorBody: ResponseBody): String {
-        // TODO parse error
-
-        return "TODO"
+    private fun <T> parseErrors(response: Response<T>): String {
+        return "Response error: " + response.code()
     }
-
 }
