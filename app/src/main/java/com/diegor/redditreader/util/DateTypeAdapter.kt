@@ -1,4 +1,4 @@
-package com.diegor.redditreader.util.result
+package com.diegor.redditreader.util
 
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader

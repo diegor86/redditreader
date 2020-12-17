@@ -12,7 +12,7 @@ import com.diegor.redditreader.data.local.LocalSourceProvider
 import com.diegor.redditreader.data.local.LocalSourceProviderImpl
 import com.diegor.redditreader.di.qualifiers.AuthOkHttpClient
 import com.diegor.redditreader.di.qualifiers.RedditOkHttpClient
-import com.diegor.redditreader.util.result.DateTypeAdapter
+import com.diegor.redditreader.util.DateTypeAdapter
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -35,7 +35,9 @@ object DataModule {
     @Provides
     fun provideGson(): Gson {
         val builder = GsonBuilder()
-            .registerTypeAdapter(Date::class.java, DateTypeAdapter())
+            .registerTypeAdapter(Date::class.java,
+                DateTypeAdapter()
+            )
 
         return builder.create()
     }

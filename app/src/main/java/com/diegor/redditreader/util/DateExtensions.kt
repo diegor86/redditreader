@@ -1,4 +1,4 @@
-package com.diegor.redditreader.util.result
+package com.diegor.redditreader.util
 
 import android.content.Context
 import com.diegor.redditreader.R

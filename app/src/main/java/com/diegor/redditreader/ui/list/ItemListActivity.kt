@@ -46,9 +46,9 @@ class ItemListActivity : AppCompatActivity(), InfiniteScrollListener, OnEntryTap
     private val viewModel by viewModels<EntryListViewModel>()
 
     private val entriesObserver = Observer<List<Entry>> {
-        val movies = it ?: return@Observer
+        val entries = it ?: return@Observer
 
-        adapter.submitList(movies)
+        adapter.submitList(entries)
     }
 
     private val loadingObserver = Observer<Boolean> {
@@ -89,7 +89,7 @@ class ItemListActivity : AppCompatActivity(), InfiniteScrollListener, OnEntryTap
         intent.data = Uri.parse(url)
         startActivity(intent)
     }
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_item_list)

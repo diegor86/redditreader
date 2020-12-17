@@ -16,6 +16,7 @@
         card_view:layout_constraintStart_toStartOf="parent"
         card_view:layout_constraintTop_toTopOf="parent"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         tools:text="Author"/>
 
     <com.facebook.drawee.view.SimpleDraweeView
