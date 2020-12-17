@@ -1,7 +1,7 @@
 package com.diegor.redditreader.domain
 
 import com.diegor.redditreader.data.SimpleStorageRepository
-import com.diegor.redditreader.util.result.DeviceIdGenerator
+import com.diegor.redditreader.util.DeviceIdGenerator
 import javax.inject.Inject
 
 class GetDeviceIdUseCase @Inject constructor(

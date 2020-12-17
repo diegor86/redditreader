@@ -2,7 +2,6 @@ package com.diegor.redditreader.ui.detail
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import com.google.android.material.appbar.CollapsingToolbarLayout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,12 +25,13 @@ class ItemDetailFragment : Fragment() {
     private val viewModel by viewModels<EntryDetailViewModel>()
 
     private lateinit var title: TextView
+    private lateinit var author: TextView
     private lateinit var thumbnail: SimpleDraweeView
 
     private val entryObserver = Observer<Entry> {
         val entry = it ?: return@Observer
 
-        activity?.findViewById<CollapsingToolbarLayout>(R.id.toolbar_layout)?.title = entry.author
+        author.text = entry.author
         title.text = entry.title
         thumbnail.setImageURI(entry.thumbnail)
 
@@ -49,7 +49,9 @@ class ItemDetailFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.item_detail, container, false)
 
+
         title = rootView.findViewById(R.id.entry_title)
+        author = rootView.findViewById(R.id.entry_author)
         thumbnail = rootView.findViewById(R.id.entry_thumbnail)
 
         return rootView

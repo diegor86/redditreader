@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.diegor.redditreader.R
 import com.diegor.redditreader.data.entities.Entry
-import com.diegor.redditreader.util.result.formatTimeAgo
+import com.diegor.redditreader.util.formatTimeAgo
 import com.facebook.drawee.view.SimpleDraweeView
 
 interface OnEntryTappedListener {
