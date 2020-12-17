@@ -26,3 +26,4 @@ An Android app that let's you read entries from the top Reddit posts.
 2. UI could be largely improved.
 3. Code coverage can be improved too. We added a lots of tests as a guideline, but our EntryListViewModel has a lot more cases that can be tested. There is a lot of logic to be tested too in our LocalSourceProviderImpl and RedditRepository.
 4. Improve error handling
+5. Save images to gallery.
