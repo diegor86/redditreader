@@ -14,5 +14,7 @@ data class Entry(
     @SerializedName("name") val name: String,
     @SerializedName("created") val created: Date,
     @SerializedName("url") val url: String?,
+    @SerializedName("thumbnail_height") val thumbnailHeight: Int?,
+    @SerializedName("thumbnail_width") val thumbnailWidth: Int?,
     @Transient val markedAsRead: Boolean = false
 ) : Parcelable
